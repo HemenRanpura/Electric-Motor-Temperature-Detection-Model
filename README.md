@@ -8,5 +8,5 @@ Folder-
   -index.html
 +EMTP.ipynb
 +app.py
-Now run the app.py file and you'll be rpovided with your local host server link, follow that link and project will be executed.
-By adding all values accorind to your motor reading you can predict how much your permanant magne would be heated ab could avoid possible risks of harming motor.
+.Now run the app.py file and you'll be provided with your local host server link, follow that link and project will be executed.
+By adding all values according to your motor reading you can predict how much your permanant magne would be heated ab could avoid possible risks of harming motor.
