@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electric Motor PM Temperature Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #007bff;
+      --secondary-color: #2d3748;
+      --accent-color: #ff6b6b;
+      --background-gradient: linear-gradient(135deg, #38a1dea8, #e84a4abb);
+      --text-color: #2d3748;
+      --light-text-color: #718096;
+      --card-background: rgba(255, 255, 255, 0.9);
+      --success-color: #38a169;
+      --success-hover-color: #2f855a;
+      --border-color: #e2e8f0;
+      --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--background-gradient);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 20px;
+      color: white;
+      animation: fadeInDown 1s ease-out;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .result-container {
+      background: var(--card-background);
+      backdrop-filter: blur(12px);
+      border-radius: 15px;
+      padding: 1px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      justify-content: center;
+      animation: fadeIn 1s ease-out;
+      margin: 0 auto;
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    .result {
+      text-align: center;
+      font-size: 1.7rem;
+      font-weight: 600;
+      color: #000000;
+      padding: 15px;
+      border-radius: 10px;
+      background: transparent;
+      transition: all 0.5s ease;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-width: 450px;
+      white-space: nowrap;
+    }
+
+    .result.success {
+      background: transparent;
+      color: var(--success-color);
+    }
+
+    .result.error {
+      background: transparent;
+      border: 2px solid var(--accent-color);
+      color: var(--accent-color);
+    }
+
+    form {
+      background: var(--card-background);
+      backdrop-filter: blur(12px);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      animation: fadeIn 1s ease-out;
+      max-width: 1200px;
+      width: 100%;
+      margin: 30px auto;
+    }
+
+    .form-group {
+      position: relative;
+    }
+
+    .form-group.full-width, button {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--text-color);
+      font-size: 0.95rem;
+      display: block;
+      margin-bottom: 8px;
+      transition: color 0.3s;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+      transform: scale(1.02);
+    }
+
+    input[type="number"]:hover {
+      border-color: var(--primary-color);
+    }
+
+    button {
+      padding: 15px;
+      background: var(--success-color);
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--success-hover-color);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    button:disabled {
+      background: #a0aec0;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 15px 30px;
+      font-size: 0.9rem;
+      color: white;
+      background: var(--secondary-color);
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      animation: fadeIn 1s ease-out;
+    }
+
+    @media (max-width: 900px) {
+      form, .result-container {
+        max-width: 100%;
+      }
+      .result {
+        min-width: 0;
+        white-space: normal;
+      }
+    }
+
+    @media (max-width: 600px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+      header h1 {
+        font-size: 1.8rem;
+      }
+      .result-container {
+        padding: 15px;
+      }
+      .result {
+        font-size: 1.2rem;
+        min-width: 0;
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Electric Motor PM Temperature Predictor</h1>
+    <div class="result-container">
+      <div class="result" id="resultBox">Enter values and click predict to see results</div>
+    </div>
+  </header>
+
+  <form id="predictionForm">
+    <div class="form-group">
+      <label for="u_q">🔌 u<sub>q</sub> (V)</label>
+      <input type="number" id="u_q" name="u_q" step="any" required value="0.5">
+    </div>
+    <div class="form-group">
+      <label for="u_d">🔌 u<sub>d</sub> (V)</label>
+      <input type="number" id="u_d" name="u_d" step="any" required value="0.1">
+    </div>
+    <div class="form-group">
+      <label for="i_q">⚡ i<sub>q</sub> (A)</label>
+      <input type="number" id="i_q" name="i_q" step="any" required value="5.0">
+    </div>
+    <div class="form-group">
+      <label for="i_d">⚡ i<sub>d</sub> (A)</label>
+      <input type="number" id="i_d" name="i_d" step="any" required value="-2.0">
+    </div>
+    <div class="form-group">
+      <label for="motor_speed">🚀 Motor Speed (RPM)</label>
+      <input type="number" id="motor_speed" name="motor_speed" step="any" required value="1800">
+    </div>
+    <div class="form-group">
+      <label for="torque">🔧 Torque (Nm)</label>
+      <input type="number" id="torque" name="torque" step="any" required value="10.0">
+    </div>
+    <div class="form-group">
+      <label for="coolant">❄️ Coolant (°C)</label>
+      <input type="number" id="coolant" name="coolant" step="any" required value="45.0">
+    </div>
+    <div class="form-group">
+      <label for="ambient">🌡️ Ambient (°C)</label>
+      <input type="number" id="ambient" name="ambient" step="any" required value="30.0">
+    </div>
+    <div class="form-group">
+      <label for="stator_winding">🌡️ Stator Winding (°C)</label>
+      <input type="number" id="stator_winding" name="stator_winding" step="any" required value="60.0">
+    </div>
+    <div class="form-group">
+      <label for="stator_yoke">🌡️ Stator Yoke (°C)</label>
+      <input type="number" id="stator_yoke" name="stator_yoke" step="any" required value="55.0">
+    </div>
+    <div class="form-group">
+      <label for="stator_tooth">🌡️ Stator Tooth (°C)</label>
+      <input type="number" id="stator_tooth" name="stator_tooth" step="any" required value="50.0">
+    </div>
+    <button type="submit" id="predictButton">
+      <span class="spinner" id="spinner"></span>
+      <span>Predict Temperature!</span>
+    </button>
+  </form>
+
+  <footer>
+    🎓 Powered by Hemen, Marmik & Jay
+  </footer>
+
+  <script>
+    document.getElementById("predictionForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      const button = document.getElementById("predictButton");
+      const spinner = document.getElementById("spinner");
+      const resultBox = document.getElementById("resultBox");
+
+      spinner.style.display = 'block';
+      button.disabled = true;
+      resultBox.style.opacity = 0;
+
+      const formData = {
+        u_q: parseFloat(document.getElementById("u_q").value),
+        u_d: parseFloat(document.getElementById("u_d").value),
+        i_q: parseFloat(document.getElementById("i_q").value),
+        i_d: parseFloat(document.getElementById("i_d").value),
+        motor_speed: parseFloat(document.getElementById("motor_speed").value),
+        torque: parseFloat(document.getElementById("torque").value),
+        coolant: parseFloat(document.getElementById("coolant").value),
+        ambient: parseFloat(document.getElementById("ambient").value),
+        stator_winding: parseFloat(document.getElementById("stator_winding").value),
+        stator_yoke: parseFloat(document.getElementById("stator_yoke").value),
+        stator_tooth: parseFloat(document.getElementById("stator_tooth").value)
+      };
+
+      for (const [key, value] of Object.entries(formData)) {
+        if (isNaN(value)) {
+          resultBox.innerText = `⚠️ Invalid input for ${key}. Please enter a valid number.`;
+          resultBox.classList.remove('success');
+          resultBox.classList.add('error');
+          spinner.style.display = 'none';
+          button.disabled = false;
+          resultBox.style.opacity = 1;
+          return;
+        }
+      }
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        resultBox.innerText = `Predicted PM Temperature: ${data.predicted_pm_temp.toFixed(2)} °C`;
+        resultBox.classList.remove('error');
+        resultBox.classList.add('success');
+      } catch (error) {
+        console.error("Prediction Error:", error);
+        resultBox.innerText = `⚠️ Prediction failed: ${error.message}`;
+        resultBox.classList.remove('success');
+        resultBox.classList.add('error');
+      } finally {
+        spinner.style.display = 'none';
+        button.disabled = false;
+        resultBox.style.opacity = 1;
+      }
+    });
+  </script>
+</body>
+</html>
