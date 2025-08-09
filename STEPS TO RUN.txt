@@ -1,0 +1,59 @@
+# Simple Run Instructions for Electric Motor PM Temperature Predictor
+
+## Folder Structure
+ElectricMotorTemperaturePredictor/
+├── templates/
+│   └── index.html
+├── app.py
+├── EMTP.ipynb
+├── measures_v2.csv
+├── pm_temp_random_forest_model.pkl (generated after training)
+└── pm_temp_scaler.pkl (generated after training)
+
+## Run Instructions
+1. Place `index.html`, `app.py`, `EMTP.ipynb`, and `measures_v2.csv` in `ElectricMotorTempPredictor/` folder.
+
+2. Open terminal and navigate to folder:
+   ```
+   cd ElectricMotorTempPredictor
+   ```
+
+3. Create virtual environment:
+   ```
+   python -m venv venv
+   ```
+
+4. Activate virtual environment:
+   - Windows:
+     ```
+     venv\Scripts\activate
+     ```
+   - macOS/Linux:
+     ```
+     source venv/bin/activate
+     ```
+
+5. Install required packages:
+   ```
+   pip install flask pandas numpy matplotlib seaborn scikit-learn joblib jupyter
+   ```
+
+6. Train the model:
+   - Run Jupyter Notebook:
+     ```
+     jupyter notebook
+     ```
+     - Open `EMTP.ipynb`, run all cells to create `pm_temp_random_forest_model.pkl` and `pm_temp_scaler.pkl`.
+
+7. Move `index.html` to `templates/` folder:
+   ```
+   mkdir templates
+   mv index.html templates/
+   ```
+
+8. Run Flask app:
+   ```
+   python app.py
+   ```
+
+9. Open browser to `http://127.0.0.1:5000` and test the predictor.
